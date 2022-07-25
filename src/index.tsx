@@ -25,7 +25,7 @@ export default class extends WeElement<MyAppProps> {
   render(props) {
     return (
       <div class="app">
-        <o-transfer data={[{key: 1 , table: "1"},{key: 2, table : "2"}]}></o-transfer>
+        <o-transfer data={[{key: 1 , table: "1"},{key: 2, table : "2"},{key: 3 , table: "3"} ,{key: 4 , table: "4"} ]}></o-transfer>
       </div>
     )
   }
