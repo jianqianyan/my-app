@@ -23,7 +23,7 @@ class Native {
     disable: Boolean
 }
 
-export type Props = OverwriteProps<Attrs, { count: Number ,data: Array<Native>, value: Array<Number>, titles?: Array<String>, bechlick1: Array<Number>, bechlick2: Array<Number> }>
+export type Props = OverwriteProps<Attrs, { count: Number, data: Array<Native>, value: Array<Number>, titles?: Array<String>, bechlick1: Array<Number>, bechlick2: Array<Number> }>
 // interface Props {
 //     data: Array<Native>,
 //     value: Array<Number>, 
@@ -52,6 +52,40 @@ export default class Transfer extends WeElement<Props> {
         bechlick2: Array<Number>,
     }
 
+    // 根据key值寻找在数组中的下标
+    findIndex = (key: Number, arr: Array<Native>) => {
+        let ans = -1;
+        arr.forEach((item, index) => {
+            if (item.key == key) {
+                ans = index;
+            }
+        })
+        return ans;
+    }
+
+    // 获取可以被点击的左边的lable数量
+    getDataNumber = () => {
+        let number = 0;
+        this.props.data.map(item => {
+            if (this.props.value.indexOf(item.key) == -1 && ('disable' in item && item.disable)) {
+                number++;
+            }
+        })
+        return this.props.data.length - this.props.value.length - number;
+    }
+
+    // 获取可以被点击的右边的lable数量
+    getValueNumber = () => {
+        let number = 0;
+        this.props.data.map(item => {
+            if (this.props.value.indexOf(item.key) != -1 && ('disable' in item && item.disable)) {
+                number++;
+            }
+        })
+        return this.props.value.length - number;
+    }
+
+    // 左边的label被点击
     labelClick = (key: Number) => {
         if (this.props.bechlick1.indexOf(key) == -1) {
             this.props.bechlick1.push(key);
@@ -62,6 +96,7 @@ export default class Transfer extends WeElement<Props> {
         this.update();
     }
 
+    // 右边的label被点击
     valueLableChilck = (key: Number) => {
         if (this.props.bechlick2.indexOf(key) == -1) {
             this.props.bechlick2.push(key);
@@ -72,6 +107,7 @@ export default class Transfer extends WeElement<Props> {
         this.update();
     }
 
+    // 中间第一个按钮
     arrowChick = () => {
         while (this.props.bechlick2.length) {
             this.props.bechlick2.pop();
@@ -80,6 +116,7 @@ export default class Transfer extends WeElement<Props> {
         this.update();
     }
 
+    // 中间第二个按钮
     forwardChick = () => {
         while (this.props.bechlick1.length) {
             this.props.value.push(this.props.bechlick1[this.props.bechlick1.length - 1]);
@@ -88,32 +125,54 @@ export default class Transfer extends WeElement<Props> {
         this.update();
     }
 
+    // 全选左边的label 考虑不能为disable 
     SelectAll = () => {
-        if (this.props.bechlick1.length < this.props.data.length - this.props.value.length) {
-            this.props.data.map(item => {
-                if (this.props.value.indexOf(item.key) == -1 && this.props.bechlick1.indexOf(item.key) == -1) {
+        if (this.props.bechlick1.length < this.getDataNumber()) {
+            this.props.data.map((item, index) => {
+                if (this.props.value.indexOf(item.key) == -1 && this.props.bechlick1.indexOf(item.key) == -1 && (!('disable' in this.props.data[index]) || this.props.data[index].disable != true)) {
                     this.props.bechlick1.push(item.key);
                 }
             })
         }
         else {
-
+            while (this.props.bechlick1.length) {
+                this.props.bechlick1.pop();
+            }
         }
         this.update();
     }
 
+    // 全选右边的label 考虑不能为disable 
     SelectValueAll = () => {
-        if (this.props.bechlick2.length < this.props.value.length) {
+        if (this.props.bechlick2.length < this.getValueNumber()) {
             this.props.value.map(item => {
-                if (this.props.bechlick2.indexOf(item) == -1) {
+                if (this.props.bechlick2.indexOf(item) == -1 && (!('disable' in this.props.data[this.findIndex(item, this.props.data)]) || this.props.data[this.findIndex(item, this.props.data)].disable != true)) {
                     this.props.bechlick2.push(item);
                 }
             })
         }
         else {
-
+            while (this.props.bechlick2.length) {
+                this.props.bechlick2.pop();
+            }
         }
         this.update();
+    }
+
+    judgeDataChecked = () => {
+        return this.getDataNumber() != 0 && this.getDataNumber() == this.props.bechlick1.length;
+    }
+
+    judgeDataindeterminate = () => {
+        return this.props.bechlick1.length > 0 && this.getDataNumber() > this.props.bechlick1.length;
+    }
+
+    judgeValueChecked = () => {
+        return this.getValueNumber() != 0 && this.getValueNumber() == this.props.bechlick2.length;
+    }
+
+    judgeValueindeterminate = () => {
+        return this.props.bechlick2.length > 0 && this.getValueNumber() > this.props.bechlick2.length
     }
 
     render(props: Props) {
@@ -122,7 +181,7 @@ export default class Transfer extends WeElement<Props> {
             <h.f>
                 <div class="transferBox">
                     <div class="transferBoxHeader">
-                        <o-checkbox label={props.titles[0]} checked={props.data.length - props.value.length == props.bechlick1.length} indeterminate={props.bechlick1.length > 0 && props.data.length - props.value.length > props.bechlick1.length} onchange={this.SelectAll}></o-checkbox>
+                        <o-checkbox label={props.titles[0]} checked={this.judgeDataChecked()} indeterminate={this.judgeDataindeterminate()} onchange={this.SelectAll}></o-checkbox>
                     </div>
 
                     <ul>
@@ -141,7 +200,7 @@ export default class Transfer extends WeElement<Props> {
                 </div>
                 <div class="transferBox">
                     <div class="transferBoxHeader">
-                        <o-checkbox label={props.titles[1]} checked={props.value.length != 0 && props.value.length == props.bechlick2.length} indeterminate={props.bechlick2.length > 0 && props.value.length > props.bechlick2.length} onchange={this.SelectValueAll}></o-checkbox>
+                        <o-checkbox label={props.titles[1]} checked={this.judgeValueChecked()} indeterminate={this.judgeValueindeterminate()} onchange={this.SelectValueAll}></o-checkbox>
                     </div>
                     <ul>
                         {
