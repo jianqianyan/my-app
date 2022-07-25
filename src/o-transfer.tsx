@@ -3,8 +3,6 @@ import { tag, h, WeElement, OverwriteProps, o } from 'omi'
 import * as css from './o-transfer.scss'
 import '@omiu/checkbox'
 import '@omiu/button'
-import '@omiu/icon/arrow-back-ios'
-import '@omiu/icon/arrow-forward-ios'
 
 export type Attrs = {
     data?: [];
@@ -137,8 +135,8 @@ export default class Transfer extends WeElement<Props> {
                 </div>
                 <div class="transferButton">
                     <div class="transferButtonBody">
-                        <o-button type="primary" onClick={this.arrowChick}><o-icon-arrow-back-ios></o-icon-arrow-back-ios></o-button>
-                        <o-button type="primary" onClick={this.forwardChick}><o-icon-arrow-forward-ios></o-icon-arrow-forward-ios></o-button>
+                        <o-button type="primary" onClick={this.arrowChick}>&lt;</o-button>
+                        <o-button type="primary" onClick={this.forwardChick}>&gt;</o-button>
                     </div>
                 </div>
                 <div class="transferBox">
