@@ -6,7 +6,7 @@ import '@omiu/button'
 
 export type Attrs = {
     data?: [];
-    value: [];
+    value?: [];
 }
 
 const tagName = 'o-transfer'
@@ -23,14 +23,7 @@ class Native {
     disable: Boolean
 }
 
-export type Props = OverwriteProps<Attrs, { count: Number, data: Array<Native>, value: Array<Number>, titles?: Array<String>, bechlick1: Array<Number>, bechlick2: Array<Number> }>
-// interface Props {
-//     data: Array<Native>,
-//     value: Array<Number>, 
-//     titles?: Array<String>, 
-//     bechlick1: Array<Number>, 
-//     bechlick2: Array<Number>
-// }
+export type Props = OverwriteProps<Attrs, { count: Number, data: Array<Native>, theValue: Array<Number>, titles?: Array<String>, bechlick1: Array<Number>, bechlick2: Array<Number> , value: Array<Number> }>
 
 @tag(tagName)
 export default class Transfer extends WeElement<Props> {
@@ -38,6 +31,7 @@ export default class Transfer extends WeElement<Props> {
 
     static defaultProps = {
         data: [],
+        theValue: [],
         value: [],
         titles: ["列表1", "列表2"],
         bechlick1: [],
@@ -46,10 +40,18 @@ export default class Transfer extends WeElement<Props> {
 
     static propTypes = {
         data: Array<Native>,
+        theValue: Array<Number>,
         value: Array<Number>,
         title: Array<String>,
         bechlick1: Array<Number>,
         bechlick2: Array<Number>,
+    }
+
+    // 组件打包之后value会被输入值绑定不会改变 因此用theValue接收value的值
+    install(){
+      this.props.value.map(item => {
+        this.props.theValue.push(item);
+      })
     }
 
     // 根据key值寻找在数组中的下标
@@ -67,22 +69,22 @@ export default class Transfer extends WeElement<Props> {
     getDataNumber = () => {
         let number = 0;
         this.props.data.map(item => {
-            if (this.props.value.indexOf(item.key) == -1 && ('disable' in item && item.disable)) {
+            if (this.props.theValue.indexOf(item.key) == -1 && ('disable' in item && item.disable)) {
                 number++;
             }
         })
-        return this.props.data.length - this.props.value.length - number;
+        return this.props.data.length - this.props.theValue.length - number;
     }
 
     // 获取可以被点击的右边的lable数量
-    getValueNumber = () => {
+    gettheValueNumber = () => {
         let number = 0;
         this.props.data.map(item => {
-            if (this.props.value.indexOf(item.key) != -1 && ('disable' in item && item.disable)) {
+            if (this.props.theValue.indexOf(item.key) != -1 && ('disable' in item && item.disable)) {
                 number++;
             }
         })
-        return this.props.value.length - number;
+        return this.props.theValue.length - number;
     }
 
     // 左边的label被点击
@@ -97,7 +99,7 @@ export default class Transfer extends WeElement<Props> {
     }
 
     // 右边的label被点击
-    valueLableChilck = (key: Number) => {
+    theValueLableChilck = (key: Number) => {
         if (this.props.bechlick2.indexOf(key) == -1) {
             this.props.bechlick2.push(key);
         }
@@ -111,7 +113,7 @@ export default class Transfer extends WeElement<Props> {
     arrowChick = () => {
         while (this.props.bechlick2.length) {
             this.props.bechlick2.pop();
-            this.props.value.pop();
+            this.props.theValue.pop();
         }
         this.update();
     }
@@ -119,7 +121,7 @@ export default class Transfer extends WeElement<Props> {
     // 中间第二个按钮
     forwardChick = () => {
         while (this.props.bechlick1.length) {
-            this.props.value.push(this.props.bechlick1[this.props.bechlick1.length - 1]);
+            this.props.theValue.push(this.props.bechlick1[this.props.bechlick1.length - 1]);
             this.props.bechlick1.pop();
         }
         this.update();
@@ -129,7 +131,7 @@ export default class Transfer extends WeElement<Props> {
     SelectAll = () => {
         if (this.props.bechlick1.length < this.getDataNumber()) {
             this.props.data.map((item, index) => {
-                if (this.props.value.indexOf(item.key) == -1 && this.props.bechlick1.indexOf(item.key) == -1 && (!('disable' in this.props.data[index]) || this.props.data[index].disable != true)) {
+                if (this.props.theValue.indexOf(item.key) == -1 && this.props.bechlick1.indexOf(item.key) == -1 && (!('disable' in this.props.data[index]) || this.props.data[index].disable != true)) {
                     this.props.bechlick1.push(item.key);
                 }
             })
@@ -143,9 +145,9 @@ export default class Transfer extends WeElement<Props> {
     }
 
     // 全选右边的label 考虑不能为disable 
-    SelectValueAll = () => {
-        if (this.props.bechlick2.length < this.getValueNumber()) {
-            this.props.value.map(item => {
+    SelecttheValueAll = () => {
+        if (this.props.bechlick2.length < this.gettheValueNumber()) {
+            this.props.theValue.map(item => {
                 if (this.props.bechlick2.indexOf(item) == -1 && (!('disable' in this.props.data[this.findIndex(item, this.props.data)]) || this.props.data[this.findIndex(item, this.props.data)].disable != true)) {
                     this.props.bechlick2.push(item);
                 }
@@ -167,12 +169,12 @@ export default class Transfer extends WeElement<Props> {
         return this.props.bechlick1.length > 0 && this.getDataNumber() > this.props.bechlick1.length;
     }
 
-    judgeValueChecked = () => {
-        return this.getValueNumber() != 0 && this.getValueNumber() == this.props.bechlick2.length;
+    judgetheValueChecked = () => {
+        return this.gettheValueNumber() != 0 && this.gettheValueNumber() == this.props.bechlick2.length;
     }
 
-    judgeValueindeterminate = () => {
-        return this.props.bechlick2.length > 0 && this.getValueNumber() > this.props.bechlick2.length
+    judgetheValueindeterminate = () => {
+        return this.props.bechlick2.length > 0 && this.gettheValueNumber() > this.props.bechlick2.length
     }
 
     render(props: Props) {
@@ -187,7 +189,7 @@ export default class Transfer extends WeElement<Props> {
                     <ul>
                         {
                             props.data.map(item => {
-                                return props.value.indexOf(item.key) === -1 && <li ><o-checkbox label={item.table} disabled={item.disable} checked={props.bechlick1.indexOf(item.key) != -1} onChange={() => this.labelClick(item.key)} ></o-checkbox></li>
+                                return props.theValue.indexOf(item.key) === -1 && <li ><o-checkbox label={item.table} disabled={item.disable} checked={props.bechlick1.indexOf(item.key) != -1} onChange={() => this.labelClick(item.key)} ></o-checkbox></li>
                             })
                         }
                     </ul>
@@ -200,12 +202,12 @@ export default class Transfer extends WeElement<Props> {
                 </div>
                 <div class="transferBox">
                     <div class="transferBoxHeader">
-                        <o-checkbox label={props.titles[1]} checked={this.judgeValueChecked()} indeterminate={this.judgeValueindeterminate()} onchange={this.SelectValueAll}></o-checkbox>
+                        <o-checkbox label={props.titles[1]} checked={this.judgetheValueChecked()} indeterminate={this.judgetheValueindeterminate()} onchange={this.SelecttheValueAll}></o-checkbox>
                     </div>
                     <ul>
                         {
                             props.data.map(item => {
-                                return props.value.indexOf(item.key) !== -1 && <li><o-checkbox label={item.table} disabled={item.disable} onChange={() => this.valueLableChilck(item.key)} checked={props.bechlick2.indexOf(item.key) != -1}></o-checkbox></li>
+                                return props.theValue.indexOf(item.key) !== -1 && <li><o-checkbox label={item.table} disabled={item.disable} onChange={() => this.theValueLableChilck(item.key)} checked={props.bechlick2.indexOf(item.key) != -1}></o-checkbox></li>
                             }
                             )}
                     </ul>
