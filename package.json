@@ -1,0 +1,23 @@
+{
+  "version": "0.0.0",
+  "author": "qianyan",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build --base=./",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "less": "^4.1.1",
+    "sass": "^1.37.5",
+    "typescript": "^4.3.2",
+    "vite": "^2.3.7"
+  },
+  "dependencies": {
+    "@omiu/button": "0.0.11",
+    "@omiu/checkbox": "0.0.13",
+    "@omiu/icon": "0.0.4",
+    "@omiu/radio": "0.0.6",
+    "omi": "latest",
+    "omiu": "^0.1.2"
+  }
+}
