@@ -7,6 +7,7 @@ import '@omiu/button'
 export type Attrs = {
     data?: [];
     value?: [];
+    titles?: [];
 }
 
 const tagName = 'o-transfer'
@@ -42,7 +43,7 @@ export default class Transfer extends WeElement<Props> {
         data: Array<Native>,
         theValue: Array<Number>,
         value: Array<Number>,
-        title: Array<String>,
+        titles: Array<String>,
         bechlick1: Array<Number>,
         bechlick2: Array<Number>,
     }
